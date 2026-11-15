@@ -18,3 +18,5 @@ target/
 *.env
 *.bak
 *.config
+
+event-data/

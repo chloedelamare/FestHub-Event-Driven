@@ -198,6 +198,44 @@ services:
       - promo-media
       - client
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: festhub-rabbitmq
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-festhub}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-festhubpass}
+
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./broker/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./broker/definitions.json:/etc/rabbitmq/definitions.json:ro
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  event-publisher:
+    build: ./event-publisher
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-festhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-festhubpass}
+      EVENT_DIRECTORY: /data/events
+    volumes:
+      - ./event-data:/data/events:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+
 
 # ==============================================================
 # Persistent PostgreSQL volumes
@@ -208,3 +246,4 @@ volumes:
   category-db-data:
   event-db-data:
   media-db-data:
+  rabbitmq-data:

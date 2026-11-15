@@ -1,0 +1,193 @@
+{
+    "permissions": [
+        {
+            "configure": ".*",
+            "read": ".*",
+            "user": "festhub",
+            "vhost": "/",
+            "write": ".*"
+        }
+    ],
+    "rabbitmq_version": "4.4.0",
+    "product_name": "RabbitMQ",
+    "product_version": "4.4.0",
+    "rabbit_version": "4.4.0",
+    "users": [
+        {
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "limits": {},
+            "name": "festhub",
+            "password_hash": "Iv2AAHdVjKFuc+Vx1uIBaX2RHSzKwmjT95hDxoxjASICT7vW",
+            "tags": [
+                "administrator"
+            ]
+        }
+    ],
+    "vhosts": [
+        {
+            "limits": {},
+            "metadata": {
+                "description": "Default virtual host",
+                "tags": [],
+                "default_queue_type": "classic"
+            },
+            "name": "/"
+        }
+    ],
+    "exchanges": [
+        {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "name": "amq.rabbitmq.log",
+            "type": "topic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "name": "festhub.dlx",
+            "type": "direct",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "name": "festhub.events",
+            "type": "topic",
+            "vhost": "/"
+        }
+    ],
+    "global_parameters": [
+        {
+            "name": "cluster_tags",
+            "value": []
+        }
+    ],
+    "parameters": [],
+    "policies": [],
+    "topic_permissions": [],
+    "explanation": "Definitions of cluster 'rabbit@festhub-rabbitmq'",
+    "rabbitmq_definition_format": "cluster",
+    "original_cluster_name": "rabbit@festhub-rabbitmq",
+    "queues": [
+        {
+            "arguments": {
+                "x-dead-letter-exchange": "festhub.dlx",
+                "x-dead-letter-routing-key": "artist.failed",
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "artist.inbound.q",
+            "type": "classic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "category-media.dlq",
+            "type": "classic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {
+                "x-dead-letter-exchange": "festhub.dlx",
+                "x-dead-letter-routing-key": "concert.failed",
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "concert.inbound.q",
+            "type": "classic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "artist.dlq",
+            "type": "classic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {
+                "x-dead-letter-exchange": "festhub.dlx",
+                "x-dead-letter-routing-key": "category-media.failed",
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "category-media.inbound.q",
+            "type": "classic",
+            "vhost": "/"
+        },
+        {
+            "arguments": {
+                "x-queue-type": "classic"
+            },
+            "auto_delete": false,
+            "durable": true,
+            "name": "concert.dlq",
+            "type": "classic",
+            "vhost": "/"
+        }
+    ],
+    "bindings": [
+        {
+            "arguments": {},
+            "destination": "artist.dlq",
+            "destination_type": "queue",
+            "routing_key": "artist.failed",
+            "source": "festhub.dlx",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "destination": "category-media.dlq",
+            "destination_type": "queue",
+            "routing_key": "category-media.failed",
+            "source": "festhub.dlx",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "destination": "concert.inbound.q",
+            "destination_type": "queue",
+            "routing_key": "artist.registered",
+            "source": "festhub.events",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "destination": "category-media.inbound.q",
+            "destination_type": "queue",
+            "routing_key": "concert.scheduled",
+            "source": "festhub.events",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "destination": "concert.dlq",
+            "destination_type": "queue",
+            "routing_key": "concert.failed",
+            "source": "festhub.dlx",
+            "vhost": "/"
+        },
+        {
+            "arguments": {},
+            "destination": "artist.inbound.q",
+            "destination_type": "queue",
+            "routing_key": "artist.inbound",
+            "source": "festhub.events",
+            "vhost": "/"
+        }
+    ]
+}
