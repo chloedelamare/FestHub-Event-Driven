@@ -36,6 +36,17 @@ public class BookingCategoryController {
                 .body(category);
     }
 
+    @PutMapping("/{id}/registration")
+    public BookingCategory register(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreateBookingCategoryRequest request) {
+
+        return service.register(
+                id,
+                request.name(),
+                request.description());
+    }
+
     @GetMapping("/{id}")
     public BookingCategory get(
             @PathVariable UUID id) {

@@ -147,6 +147,31 @@ services:
         condition: service_healthy
 
 
+  category-media-processor:
+    build: ./category-media-processor
+
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-festhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-festhubpass}
+      CATEGORY_MEDIA_MIN_CONCURRENCY: ${CATEGORY_MEDIA_MIN_CONCURRENCY:-3}
+      CATEGORY_MEDIA_MAX_CONCURRENCY: ${CATEGORY_MEDIA_MAX_CONCURRENCY:-8}
+      BOOKING_CATEGORY_SERVICE_URL: http://booking-category:8080
+      CONCERT_EVENT_SERVICE_URL: http://concert-event:8080
+      PROMO_MEDIA_SERVICE_URL: http://promo-media:8080
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      booking-category:
+        condition: service_started
+      concert-event:
+        condition: service_started
+      promo-media:
+        condition: service_started
+
+
   # ============================================================
   # Web Client
   #
@@ -234,6 +259,26 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+  concert-event-processor:
+    build: ./concert-event-processor
+
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-festhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-festhubpass}
+      CONCERT_EVENT_SERVICE_URL: http://concert-event:8080
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      concert-event:
+        condition: service_started
+      artist:
+        condition: service_started
+
+    restart: unless-stopped
 
 
 

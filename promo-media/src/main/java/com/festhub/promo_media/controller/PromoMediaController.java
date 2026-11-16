@@ -28,6 +28,13 @@ public class PromoMediaController {
         return ResponseEntity.status(201).body(promoMedia);
     }
 
+    @PutMapping("/{id}/registration")
+    public PromoMedia register(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreatePromoMediaRequest request) {
+        return service.register(id, request.eventId(), request.imageUrl());
+    }
+
     @GetMapping("/{id}")
     public PromoMedia get(@PathVariable UUID id) {
         return service.get(id);
