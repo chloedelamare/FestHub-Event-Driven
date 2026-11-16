@@ -235,6 +235,26 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  concert-event-processor:
+    build: ./concert-event-processor
+
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-festhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-festhubpass}
+      CONCERT_EVENT_SERVICE_URL: http://concert-event:8080
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      concert-event:
+        condition: service_started
+      artist:
+        condition: service_started
+
+    restart: unless-stopped
+
 
 
 # ==============================================================
