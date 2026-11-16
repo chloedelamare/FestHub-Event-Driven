@@ -10,7 +10,6 @@ import com.festhub.concert_event_processor.model.ConcertScheduledEvent.Data;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +50,7 @@ public class ConcertEventProcessor {
             List<Category> categories;
 
             if (concert.category() == null) {
-                categories = Collections.singletonList(null);
+                categories = List.of();
 
             } else {
                 UUID categoryId = stableId(
@@ -67,8 +66,9 @@ public class ConcertEventProcessor {
                     ? null
                     : concert.media().imageUrl();
 
-            List<String> mediaUrls =
-                    Collections.singletonList(imageUrl);
+            List<String> mediaUrls = imageUrl == null
+                    ? List.of()
+                    : List.of(imageUrl);
 
             UUID messageId = stableId(
                     "ConcertScheduled:" + concertId);
