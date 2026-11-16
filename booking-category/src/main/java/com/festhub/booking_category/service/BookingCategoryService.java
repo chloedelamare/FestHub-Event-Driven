@@ -7,6 +7,7 @@ import com.festhub.booking_category.repository.BookingCategoryRepository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,6 +35,43 @@ public class BookingCategoryService {
                 description);
 
         return repository.save(category);
+    }
+
+    public BookingCategory register(
+            UUID id,
+            String name,
+            String description) {
+
+        if (id == null) {
+            throw new IllegalArgumentException(
+                    "Booking category ID is required");
+        }
+
+        validate(name, description);
+
+        BookingCategory existing = repository.findById(id).orElse(null);
+        if (existing != null) {
+            if (!existing.getName().equals(name)
+                    || !existing.getDescription().equals(description)) {
+                throw new IllegalArgumentException(
+                        "Booking category ID is already registered "
+                                + "with different details: " + id);
+            }
+            return existing;
+        }
+
+        try {
+            return repository.saveAndFlush(
+                    new BookingCategory(id, name, description));
+        } catch (DataIntegrityViolationException exception) {
+            BookingCategory concurrent = repository.findById(id)
+                    .orElseThrow(() -> exception);
+            if (!concurrent.getName().equals(name)
+                    || !concurrent.getDescription().equals(description)) {
+                throw exception;
+            }
+            return concurrent;
+        }
     }
 
     public BookingCategory get(UUID id) {

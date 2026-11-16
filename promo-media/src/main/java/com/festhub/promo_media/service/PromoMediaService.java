@@ -3,6 +3,7 @@ package com.festhub.promo_media.service;
 import com.festhub.promo_media.exception.PromoMediaNotFoundException;
 import com.festhub.promo_media.model.PromoMedia;
 import com.festhub.promo_media.repository.PromoMediaRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,37 @@ public class PromoMediaService {
         validate(eventId, imageUrl);
         return repository.save(
                 new PromoMedia(UUID.randomUUID(), eventId, imageUrl));
+    }
+
+    public PromoMedia register(UUID id, UUID eventId, String imageUrl) {
+        if (id == null) {
+            throw new IllegalArgumentException("Promo media ID is required");
+        }
+        validate(eventId, imageUrl);
+
+        PromoMedia existing = repository.findById(id).orElse(null);
+        if (existing != null) {
+            if (!existing.getEventId().equals(eventId)
+                    || !existing.getImageUrl().equals(imageUrl)) {
+                throw new IllegalArgumentException(
+                        "Promo media ID is already registered "
+                                + "with different details: " + id);
+            }
+            return existing;
+        }
+
+        try {
+            return repository.saveAndFlush(
+                    new PromoMedia(id, eventId, imageUrl));
+        } catch (DataIntegrityViolationException exception) {
+            PromoMedia concurrent = repository.findById(id)
+                    .orElseThrow(() -> exception);
+            if (!concurrent.getEventId().equals(eventId)
+                    || !concurrent.getImageUrl().equals(imageUrl)) {
+                throw exception;
+            }
+            return concurrent;
+        }
     }
 
     public PromoMedia get(UUID id) {

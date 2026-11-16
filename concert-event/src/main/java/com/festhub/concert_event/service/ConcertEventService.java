@@ -134,6 +134,18 @@ public class ConcertEventService {
         return repository.save(event);
     }
 
+    public ConcertEvent updateCategories(
+            UUID id,
+            Set<UUID> categoryIds) {
+
+        ConcertEvent event = findEvent(id);
+        validateCategoryIds(categoryIds);
+        validateCategories(categoryIds);
+        event.setCategoryIds(categoryIds);
+
+        return repository.save(event);
+    }
+
     // ============================================================
     // DELETE
     // ============================================================
@@ -188,6 +200,19 @@ public class ConcertEventService {
     private void validateCategories(Set<UUID> categoryIds) {
         for (UUID categoryId : categoryIds) {
             categoryClient.validateExists(categoryId);
+        }
+    }
+
+    private static void validateCategoryIds(Set<UUID> categoryIds) {
+        if (categoryIds == null) {
+            throw new IllegalArgumentException(
+                    "Category ID set is required");
+        }
+        for (UUID categoryId : categoryIds) {
+            if (categoryId == null) {
+                throw new IllegalArgumentException(
+                        "Category IDs cannot contain null");
+            }
         }
     }
 

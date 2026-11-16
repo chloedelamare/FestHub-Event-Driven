@@ -52,6 +52,14 @@ public class ConcertEventController {
                 request.categoryIds());
     }
 
+    @PutMapping("/{id}/categories")
+    public ConcertEvent updateCategories(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateConcertEventCategoriesRequest request) {
+
+        return service.updateCategories(id, request.categoryIds());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);

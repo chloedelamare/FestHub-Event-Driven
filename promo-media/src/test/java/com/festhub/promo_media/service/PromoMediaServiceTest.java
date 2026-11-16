@@ -50,6 +50,37 @@ class PromoMediaServiceTest {
     }
 
     @Test
+    void registerIsIdempotentForMatchingMedia() {
+        UUID id = UUID.randomUUID();
+        UUID eventId = UUID.randomUUID();
+        String imageUrl = "https://example.test/festival.jpg";
+        PromoMedia existing = new PromoMedia(id, eventId, imageUrl);
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+
+        PromoMedia registered = service.register(id, eventId, imageUrl);
+
+        assertEquals(existing, registered);
+        verify(repository, never()).saveAndFlush(any(PromoMedia.class));
+    }
+
+    @Test
+    void registerRejectsReusingAnIdForDifferentMedia() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.of(
+                new PromoMedia(
+                        id,
+                        UUID.randomUUID(),
+                        "https://example.test/old.jpg")));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.register(
+                        id,
+                        UUID.randomUUID(),
+                        "https://example.test/new.jpg"));
+    }
+
+    @Test
     void updateChangesEventAndImageUrl() {
         UUID id = UUID.randomUUID();
         PromoMedia existing = new PromoMedia(
